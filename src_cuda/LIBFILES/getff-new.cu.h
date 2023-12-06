@@ -226,7 +226,9 @@ find_ind(const double *arr, const double target,
   // NOTE: this is not well-suited for GPU execution
   // return bsrch(arr, target, lo, hi);
   // Better option:
-  return lsrch(arr, target, lo, hi);
+  // return lsrch(arr, target, lo, hi);
+  // FORNOW: Testing cost of find_ind
+  return 0;
 }
 
 // extract the form factor

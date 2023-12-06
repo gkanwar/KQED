@@ -411,6 +411,9 @@ kernelQED_xoryeq0( const double qv[4] ,
 			     double txv[4][4][4] ,
 			     double tyv[4][4][4] ) )
 {
+  // FORNOW
+  return 0;
+  
   struct STV xory ;
   
   // calls either Tabd_xeq0 or Tabd_yeq0 returns 1 is something bad happens
