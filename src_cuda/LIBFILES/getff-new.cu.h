@@ -211,9 +211,18 @@ lsrch( const double *arr, const double target,
     const int lo, const int hi ) {
   int index = lo;
   for (int i = lo; i < hi; ++i) {
-    index = (arr[i] <= target && target <= arr[i+1]) ? i : index;
+    index = (__ldg(arr+i) <= target && target <= __ldg(arr+i+1)) ? i : index;
   }
   return index;
+}
+
+// assuming bins are evenly spaced from dx as XX = [dx, 2dx, ...]
+// then we can directly compute the index
+__device__ KQED_PRIVATE
+int
+find_bin(const double step, const double val, const int nx) {
+  int bin = ((int)(val / step)) - 1;
+  return max(0, min(nx, bin));
 }
 
 // returns the lower index that bounds "target"
@@ -334,6 +343,7 @@ set_invariants( const double xv[4] ,
 
   // setup INVx
   const size_t ix1 = (size_t)find_ind( Grid.XX , Inv.x , 0 , Grid.nstpx ) ;
+  // const size_t ix1 = (size_t)find_bin( Grid.xstp , Inv.x , Grid.nstpx ) ;
   size_t ix2 = ix1+1 ;
   if( ix2 >= (size_t)Grid.nstpx ) {
     ix2 = ix1 ;
@@ -342,6 +352,7 @@ set_invariants( const double xv[4] ,
   
   // setup InvY
   const size_t iy1 = (size_t)find_ind( Grid.YY , Inv.y , 0 , Grid.nstpy ) ;  
+  // const size_t iy1 = (size_t)find_bin( Grid.ystp , Inv.y , Grid.nstpy ) ;
   // y edge case
   size_t iy2 = iy1 + 1 ;
   if( iy2 >= (size_t)Grid.nstpy ) {

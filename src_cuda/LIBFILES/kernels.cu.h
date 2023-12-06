@@ -78,15 +78,15 @@ QED_kernel_L0( const double xv[4] ,
     return ;
   }
   if( x_is_zero ) {
-    kernelQED_xoryeq0( yv , t , kerv , Tabd_xeq0 ) ;
+    kernelQED_xoryeq0( yv , t , kerv , KQED_TABD_XEQ0 ) ;
     return ;
   }
   if( y_is_zero ) {
-    kernelQED_xoryeq0( xv , t , kerv , Tabd_yeq0 ) ;
+    kernelQED_xoryeq0( xv , t , kerv , KQED_TABD_YEQ0 ) ;
     return ;
   }
   if( x_is_y( xv , yv ) ) {
-    kernelQED_xoryeq0( xv , t , kerv , Tabd_yeq0 ) ;
+    kernelQED_xoryeq0( xv , t , kerv , KQED_TABD_YEQ0 ) ;
     kernel_mulam_minus( (double*)kerv ) ;
     return ;
   }

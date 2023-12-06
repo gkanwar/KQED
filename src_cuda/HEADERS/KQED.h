@@ -142,6 +142,9 @@ struct invariants {
 
 // typical defines for the main example if we need more functionality
 // just add more headers here
+#include "Tabd.h" // FORNOW
+#include "QED_kernel.h" // FORNOW
+#include "QED_kernel_xy0.h" // FORNOW
 #include "all_kernels.h"
 #include "con_kernel.h"
 #include "sub_kernel.h"

@@ -17,7 +17,7 @@ static const double dlta[4][4] = { { 1 , 0 , 0 , 0 } ,
 				   { 0 , 0 , 0 , 1 } } ;
 
 // Taylor expanded versions for x == 0
-__device__ KQED_PRIVATE
+__device__ // KQED_PRIVATE
 int
 Tabd_xeq0( const double yv[4] ,
 	   const struct Grid_coeffs Grid ,
@@ -29,6 +29,7 @@ Tabd_xeq0( const double yv[4] ,
   const double y = sqrt( fabs( ysq ) );
   
   const int iy_tay = find_ind( getTX(&Grid,YY) , y , 0 , Grid.NY_tay ) ;
+  // const int iy_tay = find_bin( getTX(&Grid,YY)[1]-getTX(&Grid,YY)[0], y, Grid.NY_tay );
 
   if( iy_tay == Grid.NY_tay-1 ) {
     // need to return here otherwise we will segfault
@@ -108,7 +109,7 @@ Tabd_xeq0( const double yv[4] ,
 }
 
 // Taylor expansions around y = 0
-__device__ KQED_PRIVATE
+__device__ // KQED_PRIVATE
 int
 Tabd_yeq0( const double xv[4] ,
 	   const struct Grid_coeffs Grid ,
@@ -120,6 +121,7 @@ Tabd_yeq0( const double xv[4] ,
   const double x = sqrt( fabs(xsq) ); 
 
   const int ix_tay = find_ind( Grid.XX , x , 0 , Grid.nstpx ) ;
+  // const int ix_tay = find_bin( Grid.xstp, x, Grid.nstpx ) ;
   
   if( x > Grid.XX[ Grid.nstpx - 1 ] ) {
     // need to return here otherwise we will segfault
