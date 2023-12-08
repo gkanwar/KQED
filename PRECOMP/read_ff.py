@@ -30,11 +30,14 @@ def read_ff():
     chksum = struct.unpack('II', bs[idx:idx+8])
     idx += 8
 
+    # NOTE: XX not evenly spaced!
+    # assert np.allclose(XX[1]-XX[0], XX[1:]-XX[:-1])
+    assert np.allclose(YY[1]-YY[0], YY[1:]-YY[:-1])
     print(f'{XX=}')
     print(f'{YY=}')
 
 
-    nth_max = 128 # TODO
+    nth_max = 128
     nffa, = struct.unpack('i', bs[idx:idx+4])
     print(f'{nffa=}')
     idx += 4
@@ -85,14 +88,35 @@ def read_tx():
         buf_size = ny_tay*8
         TX[i] = np.frombuffer(bs[idx:idx+buf_size], dtype=np.float64)
         idx += buf_size
-    print(TX[0,:10])
-    print(TX[1,:10])
-    print(TX[2,:10])
-    print(TX[3,:10])
-    print(TX[4,:10])
+    assert np.allclose(TX[0,1]-TX[0,0], TX[0,1:]-TX[0,:-1])
+
+def read_ty():
+    with open('taylory_cksum.bin', 'rb') as f:
+        bs = f.read()
+    idx = 0
+
+    magic, = struct.unpack('i', bs[idx:idx+4])
+    assert magic == 816968
+    idx += 4
+
+    n_tay_x, = struct.unpack('i', bs[idx:idx+4])
+    assert n_tay_x == TY_LEN
+    idx += 4
+
+    TY = np.zeros((TY_LEN, NXTAY), dtype=np.float64)
+    for i in range(TY_LEN):
+        nx_tay, = struct.unpack('i', bs[idx:idx+4])
+        assert nx_tay == NXTAY
+        idx += 4
+
+        buf_size = nx_tay*8
+        TY[i] = np.frombuffer(bs[idx:idx+buf_size], dtype=np.float64)
+        idx += buf_size
+
 
 def main():
-    # read_ff()
+    read_ff()
     read_tx()
+    read_ty()
 
 if __name__ == '__main__': main()
