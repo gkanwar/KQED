@@ -67,7 +67,7 @@ SCALPROD( const double xv[4] ,
 }
 
 // initialises the invariants struct
-__device__ KQED_PRIVATE
+__device__ // KQED_PRIVATE
 struct invariants
 set_invariants( const double xv[4] ,
 		const double yv[4] ,

@@ -483,12 +483,13 @@ int
 kernelQED_axpy( const double xv[4] ,
                 const double yv[4] ,
                 const struct QED_kernel_temps t ,
+                const struct STV x_y,
                 double S,
                 double kerv[6][4][4][4] )
 {
   // FFs of QED kernel and their derivatives wrt x,cb,y
-  struct STV x_y;
-  if( init_STV( xv, yv, t, &x_y ) ) return 1 ;
+  // struct STV x_y;
+  // if( init_STV( xv, yv, t, &x_y ) ) return 1 ;
 
   // point out the kernel again
   double *kp = (double*)kerv ;

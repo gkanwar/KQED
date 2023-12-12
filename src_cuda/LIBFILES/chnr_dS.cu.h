@@ -21,9 +21,9 @@ compute_dg_TAYLORX( double *dg0dy ,
   const int iy2_tay = iy_tay+1;
   const int ix  = 0;
   
-  const double ay = (getTX(&Grid,YY)[iy2_tay]-Inv.y)
+  const double ay = (__ldg(getTX(&Grid,YY)+iy2_tay)-Inv.y)
     /(getTX(&Grid,YY)[iy2_tay]-getTX(&Grid,YY)[iy_tay]);
-  const double ax = ( Grid.XX[0]-Inv.x)/( Grid.XX[0]);
+  const double ax = ( __ldg(Grid.XX)-Inv.x)/( __ldg(Grid.XX));
   
   double f1 = Inv.cb*lerp( ay , getTX(&Grid,G0dx)[iy_tay] , getTX(&Grid,G0dx)[iy2_tay] ) ;  
   double f2 = accessv( false, true, ix, iy, dxQG0, false, d0cb, Inv.cb, Inv.y, Grid );
@@ -52,11 +52,11 @@ chnr_dS( const double xv[4] ,
 {
   double dg0dy, dg0dx, dg0dcb;
   
-  if( Inv.x < Grid.XX[0] ) {
+  if( Inv.x < __ldg(Grid.XX) ) {
     if( compute_dg_TAYLORX( &dg0dy , &dg0dx , &dg0dcb , Inv, Grid ) == 1 ) {
       return 1 ;
     }
-  } else if( Inv.x > Grid.XX[ Grid.nstpx -1 ] ) {
+  } else if( Inv.x > __ldg(Grid.XX + Grid.nstpx -1) ) {
     return 1 ;
   } else { 
     double f[4] KQED_ALIGN ;

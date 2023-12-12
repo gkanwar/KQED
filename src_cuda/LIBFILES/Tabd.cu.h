@@ -38,30 +38,30 @@ Tabd_xeq0( const double yv[4] ,
   // can set this after we checked the above error
   const int iy2_tay = iy_tay+1 ;
   
-  const double ay = (getTX(&Grid,YY)[iy2_tay]-y)/( getTX(&Grid,YY)[iy2_tay]-getTX(&Grid,YY)[iy_tay]);
+  const double ay = (__ldg(getTX(&Grid,YY) + iy2_tay)-y)/( __ldg(getTX(&Grid,YY) + iy2_tay)-__ldg(getTX(&Grid,YY) + iy_tay));
   
-  const double fx       = 0.5*lerp( ay , getTX(&Grid,G0dx)[iy_tay] , getTX(&Grid,G0dx)[iy2_tay] ) ; 
-  const double fy       = 0.5*lerp( ay , getTX(&Grid,G0dy)[iy_tay] , getTX(&Grid,G0dy)[iy2_tay] ) ;
+  const double fx       = 0.5*lerp( ay , __ldg(getTX(&Grid,G0dx) + iy_tay) , __ldg(getTX(&Grid,G0dx) + iy2_tay) ) ; 
+  const double fy       = 0.5*lerp( ay , __ldg(getTX(&Grid,G0dy) + iy_tay) , __ldg(getTX(&Grid,G0dy) + iy2_tay) ) ;
   const double yhat[4]  = { yv[0]/y , yv[1]/y , yv[2]/y , yv[3]/y } ;
   
   const double dg0dy[4] = { yhat[0]*fy/2 , yhat[1]*fy/2 , yhat[2]*fy/2 , yhat[3]*fy/2 } ; 
   const double dg0dx[4] = { yhat[0]*fx/2 , yhat[1]*fx/2 , yhat[2]*fx/2 , yhat[3]*fx/2 } ;
   
-  const double ell2     = lerp( ay , getTX(&Grid,Gl2)[iy_tay] , getTX(&Grid,Gl2)[iy2_tay] ) ; 
-  const double dell2adx = lerp( ay , getTX(&Grid,Gl21)[iy_tay] , getTX(&Grid,Gl21)[iy2_tay] ) ;
-  const double dell2ady = lerp( ay , getTX(&Grid,Gl2dy)[iy_tay] , getTX(&Grid,Gl2dy)[iy2_tay] ) ;
-  const double ell3a    = lerp( ay , getTX(&Grid,Gl3)[iy_tay] , getTX(&Grid,Gl3)[iy2_tay] ) ;
+  const double ell2     = lerp( ay , __ldg(getTX(&Grid,Gl2) + iy_tay) , __ldg(getTX(&Grid,Gl2) + iy2_tay) ) ; 
+  const double dell2adx = lerp( ay , __ldg(getTX(&Grid,Gl21) + iy_tay) , __ldg(getTX(&Grid,Gl21) + iy2_tay) ) ;
+  const double dell2ady = lerp( ay , __ldg(getTX(&Grid,Gl2dy) + iy_tay) , __ldg(getTX(&Grid,Gl2dy) + iy2_tay) ) ;
+  const double ell3a    = lerp( ay , __ldg(getTX(&Grid,Gl3) + iy_tay) , __ldg(getTX(&Grid,Gl3) + iy2_tay) ) ;
   
-  const double dg2dx    = lerp( ay , getTX(&Grid,G21)[iy_tay] , getTX(&Grid,G21)[iy2_tay] ) ;
-  const double ddg2dxdy = lerp( ay , getTX(&Grid,G21dy)[iy_tay] , getTX(&Grid,G21dy)[iy2_tay] ) ;
-  const double dg1dx    = (lerp( ay , getTX(&Grid,G31A)[iy_tay] , getTX(&Grid,G31A)[iy2_tay] )
-			   -(2./3)*( lerp( ay , getTX(&Grid,G31B)[iy_tay] , getTX(&Grid,G31B)[iy2_tay] ) )
-			   -y* ( lerp( ay , getTX(&Grid,G22A)[iy_tay] , getTX(&Grid,G22A)[iy2_tay] ) ) ) ;
-  const double dg1dy    = (lerp( ay , getTX(&Grid,G3Ady)[iy_tay] , getTX(&Grid,G3Ady)[iy2_tay] )
-			   -lerp( ay , getTX(&Grid,G3Bdy)[iy_tay] , getTX(&Grid,G3Bdy)[iy2_tay] ) ) ;
-  const double phi1     = ( lerp( ay , getTX(&Grid,G22A)[iy_tay] , getTX(&Grid,G22A)[iy2_tay] )
-			    - lerp( ay , getTX(&Grid,G22B)[iy_tay] , getTX(&Grid,G22B)[iy2_tay] )/5. ) ;
-  const double phi2     = ( lerp( ay , getTX(&Grid,G22B)[iy_tay] , getTX(&Grid,G22B)[iy2_tay] ) )*1.2 ;
+  const double dg2dx    = lerp( ay , __ldg(getTX(&Grid,G21) + iy_tay) , __ldg(getTX(&Grid,G21) + iy2_tay) ) ;
+  const double ddg2dxdy = lerp( ay , __ldg(getTX(&Grid,G21dy) + iy_tay) , __ldg(getTX(&Grid,G21dy) + iy2_tay) ) ;
+  const double dg1dx    = (lerp( ay , __ldg(getTX(&Grid,G31A) + iy_tay) , __ldg(getTX(&Grid,G31A) + iy2_tay) )
+			   -(2./3)*( lerp( ay , __ldg(getTX(&Grid,G31B) + iy_tay) , __ldg(getTX(&Grid,G31B) + iy2_tay) ) )
+			   -y* ( lerp( ay , __ldg(getTX(&Grid,G22A) + iy_tay) , __ldg(getTX(&Grid,G22A) + iy2_tay) ) ) ) ;
+  const double dg1dy    = (lerp( ay , __ldg(getTX(&Grid,G3Ady) + iy_tay) , __ldg(getTX(&Grid,G3Ady) + iy2_tay) )
+			   -lerp( ay , __ldg(getTX(&Grid,G3Bdy) + iy_tay) , __ldg(getTX(&Grid,G3Bdy) + iy2_tay) ) ) ;
+  const double phi1     = ( lerp( ay , __ldg(getTX(&Grid,G22A) + iy_tay) , __ldg(getTX(&Grid,G22A) + iy2_tay) )
+			    - lerp( ay , __ldg(getTX(&Grid,G22B) + iy_tay) , __ldg(getTX(&Grid,G22B) + iy2_tay) )/5. ) ;
+  const double phi2     = ( lerp( ay , __ldg(getTX(&Grid,G22B) + iy_tay) , __ldg(getTX(&Grid,G22B) + iy2_tay) ) )*1.2 ;
   
   // various precomputations to make the loops faster
   const double ysq_4 = ysq/4. ;
@@ -123,18 +123,18 @@ Tabd_yeq0( const double xv[4] ,
   const int ix_tay = find_ind( Grid.XX , x , 0 , Grid.nstpx ) ;
   // const int ix_tay = find_bin( Grid.xstp, x, Grid.nstpx ) ;
   
-  if( x > Grid.XX[ Grid.nstpx - 1 ] ) {
+  if( x > __ldg(Grid.XX + Grid.nstpx - 1 ) ) {
     // need to return here otherwise we will segfault
     return 1 ;
   }
   // we can set this now as we aren't at the upper edge
   const int ix2_tay = ix_tay+1 ;
   
-  const double ax = ( Grid.XX[ix2_tay]-x)/( Grid.XX[ix2_tay]-Grid.XX[ix_tay]);
-  const double xa = Grid.XX[ix_tay];
-  const double xb = Grid.XX[ix2_tay];
-  const double fx = 0.5*lerp( ax , getTY(&Grid,alpha0dx_0p)[ ix_tay ], getTY(&Grid,alpha0dx_0p)[ix2_tay] ) ;
-  const double fy = ( lerp( ax , getTY(&Grid,alpha0_1p)[ix_tay] , getTY(&Grid,alpha0_1p)[ix2_tay] ) );
+  const double ax = ( __ldg(Grid.XX + ix2_tay)-x)/( __ldg(Grid.XX + ix2_tay)-__ldg(Grid.XX + ix_tay));
+  const double xa = __ldg(Grid.XX + ix_tay);
+  const double xb = __ldg(Grid.XX + ix2_tay);
+  const double fx = 0.5*lerp( ax , __ldg(getTY(&Grid,alpha0dx_0p) + ix_tay), __ldg(getTY(&Grid,alpha0dx_0p) + ix2_tay) ) ;
+  const double fy = ( lerp( ax , __ldg(getTY(&Grid,alpha0_1p) + ix_tay) , __ldg(getTY(&Grid,alpha0_1p) + ix2_tay) ) );
 
   // set by hand the array variables
   const double xhat[4] = { xv[0]/x , xv[1]/x , xv[2]/x , xv[3]/x } ;
@@ -148,36 +148,36 @@ Tabd_yeq0( const double xv[4] ,
   const double xb3 = xb2*xb ;
   const double xb4 = xb3*xb ;
 
-  const double ell1       = 4*( lerp( ax , getTY(&Grid,alpha1_0p)[ix_tay]/(xa4) ,
-				      getTY(&Grid,alpha1_0p)[ix2_tay]/(xb4) ) )/3. ;
-  const double ell3       = lerp( ax , getTY(&Grid,beta4_1p)[ix_tay]/(xa2) ,
-				  getTY(&Grid,beta4_1p)[ix2_tay]/(xb2) ) ;
+  const double ell1       = 4*( lerp( ax , __ldg(getTY(&Grid,alpha1_0p)+ix_tay)/(xa4) ,
+				      __ldg(getTY(&Grid,alpha1_0p)+ix2_tay)/(xb4) ) )/3. ;
+  const double ell3       = lerp( ax , __ldg(getTY(&Grid,beta4_1p)+ix_tay)/(xa2) ,
+				  __ldg(getTY(&Grid,beta4_1p)+ix2_tay)/(xb2) ) ;
   
-  const double dell1dx    = 4*lerp( ax , (getTY(&Grid,alpha1dx_0p)[ix_tay]
-					  -4.*getTY(&Grid,alpha1_0p)[ix_tay]/xa)/xa4 ,
-				    (getTY(&Grid,alpha1dx_0p)[ix2_tay]
-				     -4.*getTY(&Grid,alpha1_0p)[ix2_tay]/xb)/xb4 )/3. ;
+  const double dell1dx    = 4*lerp( ax , (__ldg(getTY(&Grid,alpha1dx_0p) + ix_tay)
+					  -4.*__ldg(getTY(&Grid,alpha1_0p) + ix_tay)/xa)/xa4 ,
+				    (__ldg(getTY(&Grid,alpha1dx_0p) + ix2_tay)
+				     -4.*__ldg(getTY(&Grid,alpha1_0p) + ix2_tay)/xb)/xb4 )/3. ;
   
-  const double dell1dycb  = 2*lerp( ax , (4.*getTY(&Grid,alpha1_1p)[ix_tay]/(3*xa)
-					  - getTY(&Grid,beta4_1p)[ix_tay])/xa3 ,
-				    (4.*getTY(&Grid,alpha1_1p)[ix2_tay]/(3*xb)
-				     - getTY(&Grid,beta4_1p)[ix2_tay])/xb3 ) ;
+  const double dell1dycb  = 2*lerp( ax , (4.*__ldg(getTY(&Grid,alpha1_1p) + ix_tay)/(3*xa)
+					  - __ldg(getTY(&Grid,beta4_1p) + ix_tay))/xa3 ,
+				    (4.*__ldg(getTY(&Grid,alpha1_1p) + ix2_tay)/(3*xb)
+				     - __ldg(getTY(&Grid,beta4_1p) + ix2_tay))/xb3 ) ;
   
-  const double dg1dx      = lerp( ax , getTY(&Grid,alpha3dx_0p)[ix_tay] , getTY(&Grid,alpha3dx_0p)[ix2_tay] ) ;
-  const double ddg1dxdx   = lerp( ax , getTY(&Grid,alpha3dxdx_0p)[ix_tay] , getTY(&Grid,alpha3dxdx_0p)[ix2_tay] ) ;
-  const double dg2dx      = 2*lerp( ax , getTY(&Grid,beta2dx_1p)[ix_tay] , getTY(&Grid,beta2dx_1p)[ix2_tay] ) ;
+  const double dg1dx      = lerp( ax , __ldg(getTY(&Grid,alpha3dx_0p) + ix_tay) , __ldg(getTY(&Grid,alpha3dx_0p) + ix2_tay) ) ;
+  const double ddg1dxdx   = lerp( ax , __ldg(getTY(&Grid,alpha3dxdx_0p) + ix_tay) , __ldg(getTY(&Grid,alpha3dxdx_0p) + ix2_tay) ) ;
+  const double dg2dx      = 2*lerp( ax , __ldg(getTY(&Grid,beta2dx_1p) + ix_tay) , __ldg(getTY(&Grid,beta2dx_1p) + ix2_tay) ) ;
   
-  const double dg1dycb    = 2*lerp( ax , getTY(&Grid,alpha3_1p)[ix_tay]
-				    - getTY(&Grid,beta2_1p)[ix_tay]/xa ,
-				    getTY(&Grid,alpha3_1p)[ix2_tay]
-				    - getTY(&Grid,beta2_1p)[ix2_tay]/xb ) ;
+  const double dg1dycb    = 2*lerp( ax , __ldg(getTY(&Grid,alpha3_1p) + ix_tay)
+				    - __ldg(getTY(&Grid,beta2_1p) + ix_tay)/xa ,
+				    __ldg(getTY(&Grid,alpha3_1p) + ix2_tay)
+				    - __ldg(getTY(&Grid,beta2_1p) + ix2_tay)/xb ) ;
   
-  const double ddg1dxdycb = 2*lerp( ax , getTY(&Grid,beta2_1p)[ix_tay]/(xa2)
-				    - getTY(&Grid,beta2dx_1p)[ix_tay]/xa
-				    + getTY(&Grid,alpha3dx_1p)[ix_tay] ,
-				    getTY(&Grid,beta2_1p)[ix2_tay]/(xb2)
-				    - getTY(&Grid,beta2dx_1p)[ix2_tay]/xb
-				    + getTY(&Grid,alpha3dx_1p)[ix2_tay] ) ;
+  const double ddg1dxdycb = 2*lerp( ax , __ldg(getTY(&Grid,beta2_1p) + ix_tay)/(xa2)
+				    - __ldg(getTY(&Grid,beta2dx_1p) + ix_tay)/xa
+				    + __ldg(getTY(&Grid,alpha3dx_1p) + ix_tay) ,
+				    __ldg(getTY(&Grid,beta2_1p) + ix2_tay)/(xb2)
+				    - __ldg(getTY(&Grid,beta2dx_1p) + ix2_tay)/xb
+				    + __ldg(getTY(&Grid,alpha3dx_1p) + ix2_tay) ) ;
 
   // precomputations
   const double xsq_4 = xsq/4. , E = ell1+ell3 , D1 = dell1dx + dell1dycb

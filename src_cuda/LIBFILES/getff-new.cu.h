@@ -1,5 +1,6 @@
 #include "KQED.h"      // definitions and enums
 
+#include <cassert>
 #include "cheby.h"     // chebUsum and alike
 #include "getff-new.h" // alphabetising
 
@@ -136,8 +137,8 @@ getff2( double res[2] ,
 
   mshm += mm ; mshp += mm ;
   for(j=0;j<nf;j++) {
-    *PfvalD = y1*mshp*facp*(*fp) - y1*mshm*facm*(*fm) ;
-    *Pfval = facm*(*fm) + facp*(*fp) ;
+    *PfvalD = y1*mshp*facp*__ldg(fp) - y1*mshm*facm*__ldg(fm) ;
+    *Pfval = facm*__ldg(fm) + facp*__ldg(fp) ;
     facm *= y1; facp *= y;    
     Pfval++ ; PfvalD++ ; fm++ ; fp++ ; mshm++ ; mshp++ ;
   }
@@ -156,8 +157,8 @@ accessv( const bool flag_hy, const bool use_y_derivs,
 	 const double cb, const double y, 
 	 const struct Grid_coeffs Grid )
 {
-  const int nx = Grid.nfx[ix] ;
-  const double y1 = Grid.YY[iy];
+  const int nx = __ldg(Grid.nfx+ix) ;
+  const double y1 = __ldg(Grid.YY+iy);
   double res1[2] = {0.,0.} ;
     
   // occasionally ndy gets set to 1, if use_y_derivs is set we always do the deriv
@@ -167,7 +168,7 @@ accessv( const bool flag_hy, const bool use_y_derivs,
   // if we are not at the upper limit of Y we can use info from the next point
   if(!flag_hy) {
     const int iy2 = iy+1;
-    const double y2 = Grid.YY[iy2];
+    const double y2 = __ldg(Grid.YY+iy2);
     double res2[2] = {0.,0.} ;
 
     getff2( res2 , nx, nm, ndy, ndcb, y2, cb,
@@ -196,7 +197,7 @@ bsrch( const double *arr , const double target ,
   // when hi == lo we are done
   if( ( hi - lo ) < 2 ) return lo ;
   const int mid = ( hi + lo )/2 ;
-  if( arr[mid] > target ) {
+  if( __ldg(arr+mid) > target ) {
     return bsrch( arr , target , lo , mid ) ;
   } else {
     return bsrch( arr , target , mid , hi ) ;
@@ -218,26 +219,30 @@ lsrch( const double *arr, const double target,
 
 // assuming bins are evenly spaced from dx as XX = [dx, 2dx, ...]
 // then we can directly compute the index
+// NOTE: XX isn't necessarily evenly spaced!
 __device__ KQED_PRIVATE
-int
-find_bin(const double step, const double val, const int nx) {
+inline int
+find_bin(const double *arr, const double val, const int nx) {
+  if (nx < 2) {
+    return 0;
+  }
+  const double step = __ldg(arr+1) - __ldg(arr);
+  // equal step size
+  // for (int i = 1; i < nx-1; ++i) {
+  //   assert(fabs(step - (__ldg(arr+i+1) - __ldg(arr+i))) < fabs(__ldg(arr+i))*1e-8);
+  // }
   int bin = ((int)(val / step)) - 1;
-  return max(0, min(nx, bin));
+  return max(0, min(nx-1, bin));
 }
 
 // returns the lower index that bounds "target"
 // e.g arr[lo] < target < arr[lo+1]
 // (assumes a monotonically increasing arr)
 __device__ KQED_PRIVATE
-int
+inline int
 find_ind(const double *arr, const double target,
     const int lo, const int hi) {
-  // NOTE: this is not well-suited for GPU execution
-  // return bsrch(arr, target, lo, hi);
-  // Better option:
-  // return lsrch(arr, target, lo, hi);
-  // FORNOW: Testing cost of find_ind
-  return 0;
+  return lsrch(arr, target, lo, hi);
 }
 
 // extract the form factor
@@ -246,8 +251,8 @@ double
 extractff( const FFidx nm, const bool ndy, const NDCB ndcb,
 	   const struct invariants Inv , const struct Grid_coeffs Grid )
 {  
-  const bool flag_hx = ( Inv.x >= Grid.XX[ Grid.nstpx-1 ] ) ;
-  const bool flag_hy = ( Inv.y >= Grid.YY[ Grid.nstpy-1 ] ) ;
+  const bool flag_hx = ( Inv.x >= __ldg(Grid.XX + Grid.nstpx-1) ) ;
+  const bool flag_hy = ( Inv.y >= __ldg(Grid.YY + Grid.nstpy-1) ) ;
  
   const bool use_x_derivs = (nm<dxQG0 || nm==dxQG2 || nm==dxQG3) ;
 
@@ -303,7 +308,7 @@ extractff2( const FFidx nm,
 }
 
 // Initialises the invariants used in chnr_*
-__device__ KQED_PRIVATE
+__device__ // KQED_PRIVATE
 struct invariants
 set_invariants( const double xv[4] ,
 		const double yv[4] ,
@@ -334,7 +339,7 @@ set_invariants( const double xv[4] ,
   const double rxy = ( Inv.x > Inv.y ? Inv.y/Inv.x : Inv.x/Inv.y);
 
   if( rx < rxy
-      && Inv.xmy < Grid.YY[ Grid.nstpy-1] 
+      && Inv.xmy < __ldg(Grid.YY + Grid.nstpy-1)
       && fabs(Inv.xmysq) > 1E-28 ) {
     Inv.cb = (Inv.x-Inv.y*Inv.cb)/Inv.xmy ;
     Inv.y = Inv.xmy ;    
@@ -348,7 +353,7 @@ set_invariants( const double xv[4] ,
   if( ix2 >= (size_t)Grid.nstpx ) {
     ix2 = ix1 ;
   }
-  precompute_INVx( &Inv.INVx, Inv.x, Grid.XX[ix1], Grid.XX[ix2] , ix1 ) ;
+  precompute_INVx( &Inv.INVx, Inv.x, __ldg(Grid.XX+ix1), __ldg(Grid.XX+ix2) , ix1 ) ;
   
   // setup InvY
   const size_t iy1 = (size_t)find_ind( Grid.YY , Inv.y , 0 , Grid.nstpy ) ;  
@@ -358,7 +363,7 @@ set_invariants( const double xv[4] ,
   if( iy2 >= (size_t)Grid.nstpy ) {
     iy2 = iy1 ;
   }
-  precompute_INV( &Inv.INVy , Inv.y , Grid.YY[iy1] , Grid.YY[iy2] , iy1 ) ;
+  precompute_INV( &Inv.INVy , Inv.y , __ldg(Grid.YY+iy1) , __ldg(Grid.YY+iy2) , iy1 ) ;
   
   return Inv ;
 }

@@ -28,6 +28,7 @@ int
 kernelQED_axpy( const double xv[4] ,
                 const double yv[4] ,
                 struct QED_kernel_temps t ,
+                struct STV x_y ,
                 double S ,
                 double kerv[6][4][4][4] ) ;
 

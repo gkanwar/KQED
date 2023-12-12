@@ -35,10 +35,10 @@ taylorx_contrib( const struct Grid_coeffs Grid ,
   const int iy2_tay = iy_tay+1;
   const int ix=0;
   
-  const double ay = (getTX(&Grid,YY)[iy2_tay]-y)/(getTX(&Grid,YY)[iy2_tay]-getTX(&Grid,YY)[iy_tay]);
-  const double ax = (Grid.XX[0]-x)/(Grid.XX[0]);
+  const double ay = (__ldg(getTX(&Grid,YY)+iy2_tay)-y)/(__ldg(getTX(&Grid,YY)+iy2_tay)-__ldg(getTX(&Grid,YY)+iy_tay));
+  const double ax = (__ldg(Grid.XX)-x)/(__ldg(Grid.XX));
 
-  const double xb=Grid.XX[0] ;
+  const double xb=__ldg(Grid.XX) ;
   const double xbsq=xb*xb;
 
   const double g2a = 0.0;
@@ -113,8 +113,8 @@ taylorx_contrib( const struct Grid_coeffs Grid ,
 
   if(flag2) {
     // in the case of a swap, you need the second derivative wrt y
-    const double ya = Grid.YY[iy];
-    const double yb = Grid.YY[iy+1] ; //ya+Grid.ystp;
+    const double ya = __ldg(Grid.YY+iy);
+    const double yb = __ldg(Grid.YY+iy+1) ; //ya+Grid.ystp;
     const double ddg2adydy= 0.0;
 
     const double dg2bdy_ya = accessv( false, false, ix, iy, QG2, true, d0cb, cb, ya, Grid );
@@ -122,8 +122,10 @@ taylorx_contrib( const struct Grid_coeffs Grid ,
     const double ddg2bdydy = (dg2bdy_yb-dg2bdy_ya)/Grid.ystp;
     D -> ddg2dydy = ax*ddg2adydy + (1.0-ax)*ddg2bdydy;
        
-    const double ddg1adydy = (getTX(&Grid,G3Ady)[iy2_tay]- getTX(&Grid,G3Bdy)[iy2_tay]-\
-			      ( getTX(&Grid,G3Ady)[iy_tay]- getTX(&Grid,G3Bdy)[iy_tay]))/(getTX(&Grid,YY)[iy2_tay] - getTX(&Grid,YY)[iy_tay] ) ;
+    const double ddg1adydy =
+        (__ldg(getTX(&Grid,G3Ady)+iy2_tay)- __ldg(getTX(&Grid,G3Bdy)+iy2_tay)- \
+         ( __ldg(getTX(&Grid,G3Ady)+iy_tay)- __ldg(getTX(&Grid,G3Bdy)+iy_tay)))
+        /(__ldg(getTX(&Grid,YY)+iy2_tay) - __ldg(getTX(&Grid,YY)+iy_tay) ) ;
 
     const double dg3bdy_ya = accessv( false, false, ix, iy, QG3, true, d0cb, cb, ya, Grid );
     const double dg3bdy_yb = accessv( false, false, ix, iy, QG3, true, d0cb, cb, yb, Grid );
@@ -335,13 +337,13 @@ chnr_dV( const double xv[4] ,
 {
   struct vtmp D = {} ; // zero this guy
 
-  if( Inv.x < Grid.XX[0] ) {
+  if( Inv.x < __ldg(Grid.XX) ) {
     // if this messes up we leave
     if( taylorx_contrib( Grid , &D , Inv.x , Inv.y , Inv.xsq ,
 			 Inv.flag2 , Inv.cb ) == 1 ) {
       return 1 ;
     }
-  } else if( Inv.x > Grid.XX[ Grid.nstpx -1 ] ) {
+  } else if( Inv.x > __ldg(Grid.XX + Grid.nstpx -1 ) ) {
     return 1 ;
   } else {
 
@@ -416,8 +418,8 @@ chnr_dV( const double xv[4] ,
       }
       
       struct invariants Inv1 = Inv , Inv2 = Inv ;
-      Inv1.y = Grid.YY[iy1] ;
-      Inv2.y = Grid.YY[iy1+1] ;
+      Inv1.y = __ldg(Grid.YY+iy1) ;
+      Inv2.y = __ldg(Grid.YY+iy1+1) ;
       
       double fq1 = extractff( QG2, true, d0cb, Inv1, Grid );
       double fq2 = extractff( QG2, true, d0cb, Inv2, Grid );

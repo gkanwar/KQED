@@ -38,6 +38,9 @@ extern "C" {
 #ifndef __host__
 #define __host__
 #endif
+#ifndef __ldg
+#define __ldg(x) *(x)
+#endif
 
 
 // coupling constant of QED appears in pi_pert.c and amu_for_lattice
